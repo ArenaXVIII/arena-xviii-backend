@@ -68,8 +68,8 @@ Nas seções "Dependências" das Sub-Issues publicadas, as referências `SUB-XX`
 
 | Ocorrência | Situação |
 |---|---|
-| Já existia no repositório um planejamento anterior do UC03 (Issues #3 a #11, com 8 Sub-Issues e outra decomposição) | Mantido aberto, sem alterações de conteúdo. A equipe optou por adotar o planejamento de `docs/planejamento/` (opção B). Fechar ou não as Issues antigas é uma decisão da equipe |
-| O título da Issue #3 contém "EPIC-UC12" para um épico do UC03 | Não corrigido (Issue fora do planejamento adotado) |
+| Já existia no repositório um planejamento anterior do UC03 (Issues #3 a #11, com 8 Sub-Issues e outra decomposição) | A equipe adotou o planejamento de `docs/planejamento/` (opção B). Por decisão da equipe, as Issues #3 a #11 receberam um comentário apontando para o épico #12, foram fechadas como *Not planned* e removidas do board. O histórico foi preservado e elas podem ser reabertas |
+| O título da Issue #3 contém "EPIC-UC12" para um épico do UC03 | Não corrigido (Issue fechada e fora do planejamento adotado) |
 | Ao renomear as opções do campo Status, o GitHub limpou o status de todos os itens do board | Corrigido: os itens #12 a #19 foram posicionados conforme o planejamento e as Issues #3 a #11 foram restauradas para `Backlog`, como estavam antes |
 | O token do `gh` não tinha o escopo `project` | Resolvido com `gh auth refresh -s project` |
 | A cópia local do projeto não é um repositório Git | O repositório foi clonado em outra pasta, e os artefatos foram versionados no commit `3f0cd0a` (`main`) |
