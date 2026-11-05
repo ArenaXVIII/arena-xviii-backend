@@ -7,7 +7,7 @@
 **Organization:** https://github.com/ArenaXVIII
 **Data da execução prática:** 05/11/2026
 
-> **Convenção deste relatório.** Toda saída de terminal aqui reproduzida foi obtida na execução real de 05/11/2026. Os itens marcados com **⚠ PENDENTE** dependem de uma ação manual (navegador e REST Client) e só devem ser considerados evidência depois de preenchidos com o resultado observado.
+> **Convenção deste relatório.** Toda saída de terminal, de navegador e de REST Client aqui reproduzida foi obtida na execução real de 05/11/2026. Nenhum resultado foi simulado.
 
 ---
 
@@ -41,7 +41,7 @@
 | Público interessado | Diretoria e membros da atlética, associados e atletas |
 | Primeiro slice | **UC03 — Divulgar Evento** ([`docs/casos-de-uso.md`](casos-de-uso.md), seção 5.3). Escolhido porque deriva da RN01, apontada no modelo conceitual como a regra de maior impacto, e porque define a transição central Planejado → Divulgado do ciclo de vida do Evento |
 | Estágio do backend antes deste trabalho | **Parcialmente criado.** O projeto NestJS 12 já existia (template, `package.json`, `pnpm-lock.yaml`), mas as dependências **não estavam instaladas** (sem `node_modules`). Além do template, já havia código preexistente do domínio de Eventos em `src/modules/events/` e `src/common/`, **não registrado** no `AppModule` (ver Etapa 4) |
-| Sistema operacional e terminal | Windows 11 Pro; Git Bash (MINGW64) para os comandos registrados; PowerShell 5.1 disponível |
+| Sistema operacional e terminal | Windows 11 Pro; Git Bash (MINGW64) para a maior parte dos comandos registrados; PowerShell 5.1 também usado para `pnpm start:dev` (ver Etapa 3) |
 
 Artefatos anteriores referenciados (não reescritos aqui): [`docs/visao-geral.md`](visao-geral.md) (modelo conceitual), [`docs/casos-de-uso.md`](casos-de-uso.md) (catálogo e especificações), [`docs/planejamento/`](planejamento/README.md) (planejamento do UC03, épico **#12**, sub-issues **#13 a #19**).
 
@@ -105,12 +105,14 @@ npm view @nestjs/core dist-tags.latest
 
 ## Etapa 3 — Diagnóstico e recuperação
 
-Houve duas situações. Somente a primeira exigiu correção.
+Houve quatro situações reais. A primeira e a terceira exigiram correção; a segunda e a quarta foram resolvidas sem alterar o ambiente.
 
 | Sintoma real | Interpretação | Diagnóstico executado | Correção aplicada | Validação após a correção |
 |---|---|---|---|---|
 | `pnpm -v` → `10.33.2` | Versão incompatível com a linha adotada (12) | `npm view pnpm dist-tags.latest` → `12.16.1`; `which pnpm` → `/c/Users/<usuário>/AppData/Roaming/npm/pnpm` (pnpm foi instalado via npm global) | `npm install -g pnpm@12` (mesmo canal da instalação original). Não houve alteração de `PATH` nem de `PNPM_HOME` | `pnpm -v` → `12.16.1`; `pnpm install` concluiu com `Done in 2m 42.2s using pnpm v12.16.1` |
 | `nest --version` → `command not found` | A CLI não está instalada globalmente / não está no `PATH` | `package.json` declara `"@nestjs/cli": "^12.0.0"` em `devDependencies`; após a instalação, `pnpm exec nest --version` → `12.0.8` | **Nenhuma.** A CLI local é suficiente e é a que os scripts usam. Instalar uma CLI global só para a atividade criaria uma segunda versão para manter | `pnpm start:dev` executou `nest start --watch` com sucesso (Etapa 5) |
+| `pnpm start:dev` no **PowerShell** → `O arquivo ...\npm\pnpm.ps1 não pode ser carregado porque a execução de scripts foi desabilitada neste sistema` (`PSSecurityException`, `UnauthorizedAccess`) | O pnpm está correto; quem bloqueia é a *Execution Policy* do Windows, que impede o PowerShell de rodar o *shim* `pnpm.ps1` criado pelo npm | A mensagem aponta `about_Execution_Policies`; o mesmo comando funcionava no Git Bash, que usa outro *shim* | Política do usuário alterada para `RemoteSigned` (escopo `CurrentUser`, sem afetar outros usuários). Alternativa sem alteração: `pnpm.cmd start:dev` | `Get-ExecutionPolicy -List` → `CurrentUser RemoteSigned`; `pnpm start:dev` passou a executar no PowerShell (processo `nest start --watch` iniciado às 15:33:58) |
+| A segunda execução de `pnpm start:dev` (no clone Git, 15:33) não ficou com a porta 3000 | A porta já estava ocupada pela primeira instância (PID 11340, iniciada às 15:22 a partir da cópia baixada em `.zip`), que continuou rodando | `netstat -ano` → porta 3000 `LISTENING` apenas pelo PID 11340; lista de processos mostrou que a instância das 15:33 tinha só o processo da CLI, sem o processo da aplicação (`dist/main`); `diff -rq --strip-trailing-cr` entre as duas pastas → `src/`, `package.json` e `pnpm-lock.yaml` **idênticos** (só diferem as quebras de linha) | **Nenhuma troca de porta.** Mantivemos a primeira instância, que roda o mesmo código, para que os três experimentos fossem atendidos pela **mesma aplicação**, como pede a Etapa 7 | Os três clientes receberam respostas do PID 11340, com o mesmo `ETag` `W/"c-Lve95gjOVATpfV8EL5X4nxwjKHE"` no cURL e no REST Client |
 
 Saída da atualização do pnpm:
 
@@ -314,14 +316,22 @@ Todos os experimentos usam a **mesma aplicação em execução** (PID 11340, por
 
 ### Experimento A — Navegador
 
-> **⚠ PENDENTE — executar manualmente.** Com `pnpm start:dev` rodando, abrir `http://localhost:3000/` no navegador. Registrar o navegador usado e o texto exibido. Opcional: em *DevTools → Network*, clicar na requisição e anotar o *Status Code*.
+Com `pnpm start:dev` rodando, a URL foi aberta no Mozilla Firefox, com as Ferramentas de desenvolvimento (aba **Rede**) abertas.
 
 ```text
-Navegador: <preencher>
+Navegador: Mozilla Firefox
 URL: http://localhost:3000/
-Texto exibido: <preencher>
-Status (DevTools → Network): <preencher>
+Texto exibido na página: Hello World!
+
+Ferramentas de desenvolvimento → Rede:
+Status  Método  Domínio          Arquivo      Iniciador  Tipo  Transferido  Tamanho
+304     GET     localhost:3000   /            document   html  em cache     12 B
+404     GET     localhost:3000   favicon.ico  img        json  em cache     74 B
 ```
+
+**Interpretação.** O status observado foi **304 Not Modified**, e não 200. O Firefox já tinha recebido essa página antes e guardou a resposta com o `ETag` enviado pelo Express (o mesmo `W/"c-..."` visto no cURL). Nesta requisição o navegador perguntou ao servidor se o conteúdo tinha mudado (`If-None-Match`); como o `AppService` devolve sempre o mesmo texto, o servidor respondeu 304 sem corpo e o navegador exibiu a cópia em cache. O tamanho, **12 B**, é exatamente o `Content-Length: 12` de `Hello World!`. Ou seja, a requisição chegou à aplicação e foi respondida com sucesso; o 304 é um comportamento de cache do navegador, não uma falha.
+
+A segunda linha, `GET /favicon.ico` → **404**, é uma requisição que o próprio navegador faz automaticamente em busca do ícone da aba. A aplicação não tem essa rota, então o Nest responde 404 com um corpo JSON padrão. Isso é esperado e não afeta o `GET /`.
 
 ### Experimento B — REST Client
 
@@ -335,11 +345,21 @@ Arquivo versionado na raiz do repositório: [`requests.http`](../requests.http).
 GET http://localhost:3000/
 ```
 
-> **⚠ PENDENTE — executar manualmente.** Abrir `requests.http` no VS Code com a extensão **REST Client** (Huachao Mao), clicar em *Send Request* e colar abaixo a resposta exibida no painel.
+A extensão **REST Client** (Huachao Mao) não estava instalada no VS Code (`code --list-extensions` não a listava) e foi instalada para este experimento. Com a aplicação rodando, o `requests.http` foi aberto e a requisição enviada por *Send Request*. Resposta exibida no painel *Response*:
 
 ```http
-<colar aqui a resposta do REST Client>
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Content-Type: text/html; charset=utf-8
+Content-Length: 12
+ETag: W/"c-Lve95gjOVATpfV8EL5X4nxwjKHE"
+Date: Thu, 05 Nov 2026 18:37:08 GMT
+Connection: close
+
+Hello World!
 ```
+
+O `ETag` é idêntico ao do cURL (Experimento C), o que confirma que o mesmo servidor produziu o mesmo conteúdo. Diferente do navegador, o REST Client não guarda cache entre envios, por isso recebeu `200` com o corpo completo. A única diferença de cabeçalho em relação ao cURL é `Connection: close`: o REST Client pede para encerrar a conexão após a resposta, enquanto o cURL a manteve aberta (`keep-alive`). Isso é decisão do cliente, não da aplicação.
 
 ### Experimento C — cURL
 
@@ -368,12 +388,12 @@ Cliente: `curl 8.7.1 (x86_64-w64-mingw32)`. O cabeçalho `Date` está em GMT; 18
 
 | Cliente | Requisição realizada | Status observado | Corpo observado | Evidência no relatório/repositório |
 |---|---|---|---|---|
-| Navegador | `GET http://localhost:3000/` | ⚠ PENDENTE | ⚠ PENDENTE | Experimento A |
-| REST Client | `GET http://localhost:3000/` (`requests.http`) | ⚠ PENDENTE | ⚠ PENDENTE | `requests.http` + Experimento B |
+| Navegador (Firefox) | `GET http://localhost:3000/` | `304 Not Modified` (revalidação de cache) | `Hello World!` exibido (12 B, cópia em cache) | Experimento A |
+| REST Client | `GET http://localhost:3000/` (`requests.http`) | `200 OK` | `Hello World!` (12 bytes) | `requests.http` + resposta completa no Experimento B |
 | cURL | `curl -i http://localhost:3000/` | `200 OK` | `Hello World!` (12 bytes) | Saída completa no Experimento C |
 
 **O que permanece igual:** servidor (mesmo processo, porta 3000), rota (`GET /`), handler (`AppController.getHello` → `AppService.getHello`) e resposta produzida (`200`, `Hello World!`).
-**O que muda:** o cliente e a forma de ver a resposta. O navegador renderiza só o corpo como página. O REST Client mostra status, cabeçalhos e corpo num painel do editor e deixa a requisição salva no repositório. O cURL com `-i` mostra a resposta HTTP crua no terminal, com os cabeçalhos (`X-Powered-By: Express` confirma o adaptador `platform-express`).
+**O que muda:** o cliente e a forma de ver a resposta. O navegador renderiza só o corpo como página e usa cache (por isso o `304` na revalidação). O REST Client mostra status, cabeçalhos e corpo num painel do editor e deixa a requisição salva no repositório. O cURL com `-i` mostra a resposta HTTP crua no terminal, com os cabeçalhos (`X-Powered-By: Express` confirma o adaptador `platform-express`).
 
 ---
 
@@ -390,10 +410,10 @@ Cliente: `curl 8.7.1 (x86_64-w64-mingw32)`. O cabeçalho `Date` está em GMT; 18
 | Aplicação iniciada sem erro bloqueante | Sim | `Found 0 errors` + `Nest application successfully started` |
 | Porta e endereço identificados | Sim | `http://localhost:3000/`; PID 11340 em `LISTENING` |
 | Principais arquivos compreendidos | Sim | Etapa 6 |
-| `GET /` validado no navegador | ⚠ Pendente | Experimento A a executar |
-| `GET /` validado no REST Client | Parcial | `requests.http` criado; execução pendente (Experimento B) |
+| `GET /` validado no navegador | Sim | Firefox exibiu `Hello World!`; aba Rede mostrou `304` (revalidação de cache do conteúdo de 12 B) — Experimento A |
+| `GET /` validado no REST Client | Sim | `requests.http` → `HTTP/1.1 200 OK` + `Hello World!` (Experimento B) |
 | `GET /` validado no cURL | Sim | `HTTP/1.1 200 OK` + `Hello World!` |
-| Código e documentação relevantes versionados no GitHub | ⚠ Pendente | A cópia local veio de um `.zip` e não é repositório Git. `requests.http`, este relatório e o README atualizado precisam ser commitados no clone e enviados ao `main` |
+| Código e documentação relevantes versionados no GitHub | Sim | `package.json`, `pnpm-lock.yaml`, `src/`, `requests.http`, README atualizado e este relatório estão no `main` de [ArenaXVIII/arena-xviii-backend](https://github.com/ArenaXVIII/arena-xviii-backend); `node_modules` e `dist` ignorados pelo `.gitignore` |
 
 **O que o Hello World comprova e o que não comprova.** O Hello World comprova que a cadeia técnica funciona de ponta a ponta neste ambiente: o Node 24 executa o código, o pnpm 12 instalou as dependências do lockfile, o TypeScript compila em ESM sem erros, o NestJS 12 monta o container de DI e o roteamento, e uma requisição HTTP real a `GET /` volta com `200 OK` e o corpo esperado. Ele **não** comprova nada sobre o ARENA XVIII: nenhum Evento é localizado, nenhuma regra de negócio (RN01, RN-UC03-01 a 03) é avaliada pela aplicação em execução, nada é persistido, não há contrato de erro e não há rota de divulgação. O código preexistente de Eventos sequer está registrado no `AppModule`. A base técnica está pronta; o primeiro slice não.
 
@@ -630,7 +650,7 @@ Cada participante do diagrama tem um motivo no UC03: o controller porque existe 
 ## Etapa 17 — Reflexão crítica
 
 1. **Que evidência demonstra que a aplicação funciona, além do log?** A resposta real do cURL: `HTTP/1.1 200 OK`, `Content-Length: 12`, corpo `Hello World!`, com cabeçalho `Date` 5 segundos depois do log de inicialização, e o `netstat` mostrando o mesmo PID (11340) do log escutando na porta 3000. Complementam os 8 testes aprovados no `pnpm test`.
-2. **Que dificuldade técnica ocorreu?** O pnpm local estava na linha 10 e o `nest` global não existia. O checkpoint "verificar antes de instalar" evitou duas intervenções desnecessárias: não reinstalamos o Node (24 já compatível) e não instalamos a CLI global (a local, 12.0.8, já resolvia). O único ajuste foi o pnpm.
+2. **Que dificuldade técnica ocorreu?** O pnpm local estava na linha 10, o `nest` global não existia, o PowerShell bloqueou o `pnpm.ps1` pela *Execution Policy* e uma segunda instância encontrou a porta 3000 ocupada pela primeira. O checkpoint "verificar antes de instalar" evitou intervenções desnecessárias: não reinstalamos o Node (24 já compatível), não instalamos a CLI global (a local, 12.0.8, já resolvia) e não trocamos de porta, porque o `netstat` mostrou que a porta estava com a nossa própria aplicação, rodando o mesmo código.
 3. **Diferença entre Nest CLI e framework NestJS?** Ficou concreta: a CLI global nem existia e a aplicação rodou mesmo assim, porque a CLI é só ferramenta de desenvolvimento (local 12.0.8) e o framework é dependência da aplicação (`@nestjs/core` 12.1.2). As versões são diferentes e independentes.
 4. **O que os arquivos do template explicam sobre `GET /`?** Que a rota nasce da combinação `@Controller()` sem prefixo + `@Get()` sem caminho; que o controller não produz o texto, só delega ao service injetado pelo `AppModule`; e que o `Content-Type: text/html` vem de o handler devolver uma string, não um objeto.
 5. **Por que o NestJS não determina sozinho a arquitetura?** Ele oferece mecanismos (módulo, controller, provider, DI), mas não sabe o que é um Evento, qual regra é invariante nem onde ela deve morar. Dá para escrever toda a RN01 dentro de um controller e o Nest compilaria igual. A divisão Interface/Aplicação/Domínio/Infraestrutura é decisão da equipe.
@@ -650,7 +670,7 @@ Cada participante do diagrama tem um motivo no UC03: o controller porque existe 
 | Finalidade | Executar e registrar os comandos de verificação do ambiente; ler o template e os documentos anteriores; redigir o rascunho deste relatório |
 | Exemplos de pedidos | "Preciso entregar este trabalho" (com o PDF do enunciado); a ferramenta então listou os arquivos do projeto, executou `node -v`, `pnpm -v`, `pnpm install`, `pnpm start:dev`, `curl -i` e `pnpm test` |
 | Contribuição real | Executou os comandos no terminal e registrou as saídas reais; identificou que o pnpm 10 estava fora da linha adotada e que a CLI local dispensava a global; encontrou o código de Eventos não registrado no `AppModule` e a inconsistência com o status "implementada" do catálogo; criou o `requests.http`; redigiu as tabelas da Parte B a partir de `casos-de-uso.md` e `planejamento/` |
-| Sugestões rejeitadas/corrigidas | Instalar a Nest CLI globalmente foi descartado (desnecessário). A IA não preencheu os resultados do navegador e do REST Client, que ficaram marcados como pendentes por exigirem execução humana |
+| Sugestões rejeitadas/corrigidas | Instalar a Nest CLI globalmente foi descartado (desnecessário). A IA não preencheu os resultados do navegador e do REST Client: eles foram executados pela equipe (Firefox e extensão REST Client) e só então registrados, a partir do print e da resposta copiada do painel |
 | Método de verificação | As saídas registradas na Parte A vêm das execuções reais de 05/11/2026 (horários do log e do cabeçalho `Date` batem). A equipe deve reexecutar `curl -i`, abrir o navegador e enviar o `requests.http` para conferir e completar as pendências |
 | Limitações | A IA não opera o navegador nem a interface da extensão REST Client; essas evidências são de responsabilidade da equipe |
-| "Conseguiríamos explicar e repetir os procedimentos e defender as decisões sem a IA?" | *⚠ Resposta a ser escrita pela equipe, com sinceridade, depois de revisar o relatório.* |
+| "Conseguiríamos explicar e repetir os procedimentos e defender as decisões sem a IA?" | **Sim, com ressalvas.** Os procedimentos da Parte A conseguimos repetir sozinhos: são poucos comandos (`node -v`, `pnpm -v`, `pnpm install`, `pnpm start:dev`, `curl -i`), e os testes no navegador e no REST Client foram feitos pela própria equipe, inclusive resolvendo o bloqueio do PowerShell. Também conseguimos explicar o caminho do `GET /` pelo template e por que o navegador mostrou `304` e não `200`. As decisões da Parte B vêm dos nossos próprios documentos (`casos-de-uso.md`, planejamento do UC03), então conseguimos defendê-las. A ressalva é que a IA acelerou o diagnóstico (por exemplo, perceber que a CLI local dispensava a global e investigar a porta ocupada) e a redação; sem ela levaríamos mais tempo e precisaríamos consultar a documentação do NestJS e do pnpm |
