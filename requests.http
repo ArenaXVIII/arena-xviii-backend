@@ -1,0 +1,5 @@
+### Base técnica — prova de vida do template NestJS 12
+# Porta padrão definida em src/main.ts (process.env.PORT ?? 3000)
+# Execute com a extensão REST Client (VS Code): clique em "Send Request".
+
+GET http://localhost:3000/

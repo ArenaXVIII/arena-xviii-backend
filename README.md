@@ -32,9 +32,32 @@ O tema se relaciona ao item "Sistema de gestão de associações e clubes", com 
 - Bolivar Torres Neto
 - Luna Ribeiro
 
-## Tecnologia principal prevista
+## Tecnologia
 
-_(a definir)_
+- **Node.js 24**
+- **pnpm 12** (único gerenciador de dependências; não use npm nem yarn para instalar)
+- **NestJS 12** (TypeScript, ESM) com **Vitest** para testes
+
+## Como executar
+
+Pré-requisitos: Node.js 24 e pnpm 12 (`node -v`, `pnpm -v`). A Nest CLI global **não** é necessária: o projeto usa a CLI local.
+
+```bash
+pnpm install       # instala as dependências do pnpm-lock.yaml
+pnpm start:dev     # inicia em modo watch em http://localhost:3000
+pnpm test          # testes unitários
+pnpm test:e2e      # testes ponta a ponta
+```
+
+Para validar, com a aplicação rodando:
+
+```bash
+curl -i http://localhost:3000/   # esperado: HTTP/1.1 200 OK e "Hello World!"
+```
+
+Ou abra [`requests.http`](requests.http) no VS Code com a extensão REST Client.
+
+A porta pode ser alterada pela variável de ambiente `PORT`.
 
 ## Desenvolvimento incremental por slices
 
@@ -42,10 +65,13 @@ O sistema será construído de forma incremental, por **slices verticais**. Cada
 
 ### Primeiro slice arquitetural
 
-_(a definir)_
+**UC03 — Divulgar Evento** (épico [#12](https://github.com/ArenaXVIII/arena-xviii-backend/issues/12)). Situação atual: a base técnica NestJS está validada (`GET /` → `Hello World!`); o slice está em implementação e ainda não é acessível por HTTP.
 
 ## Documentação
 
 A documentação do projeto está na pasta [`docs/`](docs/):
 
 - [`visao-geral.md`](docs/visao-geral.md): modelo conceitual do domínio, com conceitos, entidades e objetos de valor, relações, cardinalidades, regras de negócio, invariantes, ciclo de vida do Evento e pendências de governança.
+- [`casos-de-uso.md`](docs/casos-de-uso.md): catálogo e especificações dos casos de uso.
+- [`planejamento/`](docs/planejamento/README.md): planejamento da implementação por caso de uso.
+- [`02-base-tecnica-nestjs-12.md`](docs/02-base-tecnica-nestjs-12.md): validação da base técnica NestJS 12 e planejamento do primeiro slice.
