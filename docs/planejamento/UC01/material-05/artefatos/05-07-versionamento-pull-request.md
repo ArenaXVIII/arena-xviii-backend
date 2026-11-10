@@ -1,6 +1,8 @@
 # 05-07 — Versionamento e Pull Request
 
-## Commit realizado
+## Commits realizados
+
+### 1) Implementação GREEN
 
 ```bash
 git log -1 --stat
@@ -23,6 +25,29 @@ Date:   Tue Nov 10 2026 16:10:00 -03:00
  src/modules/events/services/events.service.ts                          | 50 +++++++++++++++++++
 ```
 
+### 2) Artefatos Material 05
+
+```bash
+git log -1 --stat
+```
+
+```text
+commit fc4db03
+Author: luna.as <luna.as@itaipuparquetec.org.br>
+Date:   Tue Nov 10 16:12:01 2026 -0300
+
+    docs(material-05): add green implementation artifacts (ref #26)
+
+ .../material-05/artefatos/05-01-diagnostico-red.md |  30 +++++
+ .../artefatos/05-02-escopo-issues-branches.md      |  33 +++++
+ .../artefatos/05-03-plano-implementacao-green.md   |  29 ++++
+ .../artefatos/05-04-implementacao-green.md         | 146 +++++++++++++++++++++
+ .../artefatos/05-05-evidencias-testes-green.md     |  51 +++++++
+ .../artefatos/05-06-analise-qualidade.md           |  26 ++++
+ .../artefatos/05-07-versionamento-pull-request.md  |  77 +++++++++++
+ .../artefatos/05-08-checklist-consistencia.md      |  25 ++++
+```
+
 ## Status do repositório
 
 ```bash
@@ -30,14 +55,8 @@ git status --short
 ```
 
 ```text
- M docs/planejamento/UC01/material-05/artefatos/05-07-versionamento-pull-request.md
-?? docs/planejamento/UC01/material-05/artefatos/05-01-diagnostico-red.md
-?? docs/planejamento/UC01/material-05/artefatos/05-02-escopo-issues-branches.md
-?? docs/planejamento/UC01/material-05/artefatos/05-03-plano-implementacao-green.md
-?? docs/planejamento/UC01/material-05/artefatos/05-04-implementacao-green.md
-?? docs/planejamento/UC01/material-05/artefatos/05-05-evidencias-testes-green.md
-?? docs/planejamento/UC01/material-05/artefatos/05-06-analise-qualidade.md
-?? docs/planejamento/UC01/material-05/artefatos/05-08-checklist-consistencia.md
+On branch test/26-uc01-sub06-event-registration-e2e
+nothing to commit, working tree clean
 ```
 
 ## Push da branch
@@ -48,7 +67,7 @@ git push
 
 ```text
 To https://github.com/ArenaXVIII/arena-xviii-backend.git
-   be16843..99fe329  test/26-uc01-sub06-event-registration-e2e -> test/26-uc01-sub06-event-registration-e2e
+   99fe329..fc4db03  test/26-uc01-sub06-event-registration-e2e -> test/26-uc01-sub06-event-registration-e2e
 ```
 
 ## Pull Request
