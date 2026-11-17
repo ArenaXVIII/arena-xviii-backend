@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: arenaxviii-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-arenaxviii_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-arenaxviii_password}
+      POSTGRES_DB: ${DB_NAME:-arenaxviii_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - arenaxviii_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U arenaxviii_user -d arenaxviii_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  postgres-test:
+    image: postgres:17
+    container_name: arenaxviii-postgres-test
+    profiles: ["test"]
+    environment:
+      POSTGRES_USER: ${TEST_DB_USERNAME:-arenaxviii_test_user}
+      POSTGRES_PASSWORD: ${TEST_DB_PASSWORD:-local_test_password}
+      POSTGRES_DB: ${TEST_DB_NAME:-arenaxviii_test_db}
+    ports:
+      - "${TEST_DB_PORT:-5434}:5432"
+    volumes:
+      - arenaxviii_postgres_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  arenaxviii_postgres_data:
+  arenaxviii_postgres_test_data:
