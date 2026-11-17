@@ -6,7 +6,7 @@ import { InMemoryEventsRepository } from './repositories/in-memory-events.reposi
 import { EventsService } from './services/events.service.js';
 
 @Module({
-  controllers: [EventsController],
+  controllers: [EventsController],S
   providers: [
     EventsService,
     InMemoryEventsRepository,

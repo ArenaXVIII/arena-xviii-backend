@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { EventStatus } from '../../../common/enum/event-status.enum.js';
 import { EventAlreadyPublishedException } from '../../../common/exceptions/event-already-published.exception.js';
 import { EventNotPlannedException } from '../../../common/exceptions/event-not-planned.exception.js';
@@ -6,6 +7,28 @@ import { EventPlanningIncompleteException } from '../../../common/exceptions/eve
 export class Event {
   private status: EventStatus;
   private updatedAt: Date;
+
+  static create(name: string): Event {
+    const normalizedName = name?.trim();
+
+    if (!normalizedName) {
+      throw new Error('Event name is required.');
+    }
+
+    return new Event(
+      randomUUID(),
+      normalizedName,
+      EventStatus.PLANNING,
+      null,
+      null,
+      null,
+      [],
+      [],
+      new Date(),
+      new Date(),
+      null,
+    );
+  }
 
   constructor(
     public readonly eventId: string,
