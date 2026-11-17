@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "type": "module",
+  "packageManager": "pnpm@10.34.9",
   "scripts": {
     "build": "nest build",
     "deploy": "nest deploy",
@@ -22,7 +23,9 @@
     "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
     "test:integration": "vitest run --config ./vitest.config.postgres.ts",
     "migration:show": "pnpm build && typeorm migration:show -d dist/database/data-source.js",
-    "migration:run": "pnpm build && typeorm migration:run -d dist/database/data-source.js"
+    "migration:run": "pnpm build && typeorm migration:run -d dist/database/data-source.js",
+    "migration:show:prod": "typeorm migration:show -d dist/database/data-source.js",
+    "migration:run:prod": "typeorm migration:run -d dist/database/data-source.js"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",
