@@ -14,19 +14,18 @@ Variaveis de desenvolvimento: `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`
 
 Variaveis de teste: `TEST_DB_HOST`, `TEST_DB_PORT`, `TEST_DB_USERNAME`, `TEST_DB_PASSWORD`, `TEST_DB_NAME` e `TEST_DB_ALLOW_DESTRUCTIVE`. O teste nao executa limpeza destrutiva e nao depende de `TEST_DB_ALLOW_DESTRUCTIVE`.
 
-Comando de verificacao executado:
+Na primeira verificacao, `docker compose ps` nao conseguiu conectar ao pipe do Docker Desktop. Depois, o engine ficou disponivel e foi iniciado somente o servico de teste:
 
 ```text
-docker compose ps
-error: nao foi possivel conectar ao pipe do Docker Desktop (dockerDesktopLinuxEngine)
+docker compose --profile test up -d postgres-test
+Container arenaxviii-postgres-test Started
+Volume arena-xviii-backend_arenaxviii_postgres_test_data Created
 ```
 
-Portanto, nem o servico de desenvolvimento nem o servico de teste tiveram conexao ou healthcheck verificados. A tentativa de `pnpm test:integration`, com as variaveis de teste temporarias apontando para `localhost:5434`, retornou `ECONNREFUSED` para IPv6 e IPv4 antes de inicializar o DataSource ou executar migrations. Nenhum segredo temporario foi gravado em arquivo.
+`docker compose --profile test ps` reportou `Up (healthy)` e `0.0.0.0:5434->5432/tcp`; `pg_isready` respondeu `accepting connections`. Uma consulta TCP retornou `arenaxviii_test_db`, `arenaxviii_test_user` e `inet_server_port() = 5432`. Nenhum segredo temporario foi gravado em arquivo.
 
-## Proximo procedimento, ainda nao executado
-
-Com Docker Desktop ativo, revisar `docker compose config`, iniciar somente o servico de teste com `docker compose --profile test up -d postgres-test`, aguardar o healthcheck e confirmar a conexao e a identidade do banco. Nao executar migrations ate confirmar `current_database()` e `current_user` contra `TEST_DB_NAME` e `TEST_DB_USERNAME`.
+O banco de desenvolvimento nao foi iniciado; ele permanece sem conexao verificada. O container antigo `welcome-to-docker`, que estava parado e nao pertence a este Compose, foi preservado.
 
 ## Estado
 
-A configuracao separada foi implementada, mas inicializacao, conexao e identidade PostgreSQL permanecem pendentes por indisponibilidade do Docker Desktop. A porta host 5434 nao foi confundida com a porta interna 5432.
+A configuracao, inicializacao, conexao e identidade do banco de teste foram confirmadas. A porta host 5434 nao foi confundida com a porta interna 5432. A conexao do banco de desenvolvimento continua pendente.

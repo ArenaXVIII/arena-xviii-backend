@@ -23,6 +23,7 @@ export class CreateEventsTable1794873600000 implements MigrationInterface {
     CONSTRAINT "PK_events_eventId" PRIMARY KEY ("eventId")
   )
 `);
+  }
 
   async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query('DROP TABLE "events"');

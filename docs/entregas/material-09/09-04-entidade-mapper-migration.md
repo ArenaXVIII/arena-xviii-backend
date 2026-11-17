@@ -78,7 +78,7 @@ export class CreateEventsTable1794873600000 implements MigrationInterface {
       `CREATE TYPE "events_status_enum" AS ENUM ('planning', 'planned', 'published', 'in_organization', 'rescheduled', 'cancelled', 'held', 'closed')`,
     );
     await queryRunner.query(`
-      CREATE TABLE "events" (
+      CREATE TABLE IF NOT EXISTS "events" (
         "eventId" uuid NOT NULL,
         "name" text NOT NULL,
         "status" "events_status_enum" NOT NULL,
@@ -149,4 +149,8 @@ O Mapper apenas traduz dados e copia os arrays; nao contem regras de negocio.
 
 ## Evidencia e limite
 
-`pnpm build` e `pnpm exec tsc --noEmit` passaram. O teste unitario do Mapper/adaptador passou (3 testes). O SQL esperado esta descrito acima, mas a tabela real, `information_schema` e tabela `migrations` nao foram consultadas: nao havia PostgreSQL ativo. A migration nao foi aplicada, por seguranca.
+`pnpm build` e `pnpm exec tsc --noEmit` passaram apos corrigir o fechamento do metodo `up`. A migration foi aplicada ao banco de teste depois de confirmar banco, usuario, ausencia de `events`, `migrations` e `events_status_enum`.
+
+A consulta a `information_schema.columns` retornou 11 colunas e confirmou nomes, tipos e nulabilidade: `eventId uuid NOT NULL`, `name text NOT NULL`, `status USER-DEFINED/events_status_enum NOT NULL`, `date timestamptz NULL`, `location text NULL`, `budget double precision NULL`, `responsibles text[] NOT NULL`, `activities text[] NOT NULL`, `createdAt timestamptz NOT NULL`, `updatedAt timestamptz NOT NULL` e `deletedAt timestamptz NULL`. A tabela `migrations` registrou timestamp `1794873600000` e nome `CreateEventsTable1794873600000`. Antes do teste de integracao, `events` tinha zero linhas.
+
+Essas verificacoes foram feitas no banco exclusivo de testes. A migration ainda nao foi aplicada no banco de desenvolvimento.
