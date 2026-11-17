@@ -3,3 +3,11 @@
 # Execute com a extensão REST Client (VS Code): clique em "Send Request".
 
 GET http://localhost:3000/
+
+###
+
+PATCH http://localhost:3000/events/1/publish
+
+###
+
+PATCH http://localhost:3000/events/%20/publish
