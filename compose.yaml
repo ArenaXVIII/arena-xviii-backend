@@ -1,4 +1,24 @@
 services:
+  api:
+    container_name: arenaxviii-api
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: arenaxviii-api:dev
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: ${DB_USERNAME:-arenaxviii_user}
+      DB_PASSWORD: ${DB_PASSWORD:-arenaxviii_password}
+      DB_NAME: ${DB_NAME:-arenaxviii_db}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   postgres:
     image: postgres:17
     container_name: arenaxviii-postgres

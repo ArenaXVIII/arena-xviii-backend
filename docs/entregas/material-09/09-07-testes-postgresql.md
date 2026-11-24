@@ -158,6 +158,8 @@ describe('Events PostgreSQL persistence', () => {
 
 ## Execucao observada
 
-`pnpm test:integration` foi executado com variaveis temporarias distintas para o banco de desenvolvimento e teste, apontando para `localhost:5434`. Resultado real: a inicializacao do driver falhou com `ECONNREFUSED` em `::1:5434` e `127.0.0.1:5434`; o hook nao chegou a validar identidade nem a chamar `runMigrations()`. Saida: 1 arquivo falhou e 1 teste foi ignorado devido a falha no setup. Nao houve operacao no banco.
+Na primeira tentativa, `pnpm test:integration` encontrou `ECONNREFUSED` porque o Docker Desktop ainda nao estava ativo; nenhuma migration foi executada nessa tentativa. Depois, o container dedicado foi iniciado e a identidade foi confirmada como `arenaxviii_test_db` / `arenaxviii_test_user` pela porta host 5434 (porta interna 5432).
 
-Depois da tentativa, a regressao foi reexecutada: `pnpm test --run` passou com 4 arquivos e 14 testes. `pnpm exec tsc --noEmit` e `pnpm lint` tambem passaram. O teste PostgreSQL real continua pendente ate que o servico dedicado esteja ativo e a identidade do banco seja comprovada.
+`pnpm migration:run`, com `DB_*` temporariamente apontando para esse banco verificado, aplicou `CreateEventsTable1794873600000`. A consulta SQL confirmou tabela, 11 colunas, historico `migrations` e zero linhas antes do teste. Em seguida, `pnpm test:integration` passou: 1 arquivo, 1 teste. O teste persistiu e consultou por SQL o evento de UUID `76685ac0-e140-4f2f-aa96-0ea602d377c9`, com status `planning`, nome `Material 09 PostgreSQL integration event` e campos verificados pelas assercoes.
+
+Apos a integracao, `pnpm test --run` passou com 4 arquivos e 14 testes; `pnpm exec tsc --noEmit` e `pnpm lint` tambem passaram. Nenhuma limpeza destrutiva foi executada. As evidencias de cadastro HTTP no banco de desenvolvimento e durabilidade apos reiniciar o backend continuam pendentes.

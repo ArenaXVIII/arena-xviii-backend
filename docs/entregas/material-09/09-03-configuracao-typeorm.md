@@ -13,13 +13,13 @@ Em `NODE_ENV=test`, `AppModule` e `EventsModule` nao abrem conexao PostgreSQL e 
 ## Scripts
 
 - `pnpm migration:show`: compila e consulta o historico/configuracao, sem aplicar migration.
-- `pnpm migration:run`: compila e aplica migrations ao banco indicado por `DB_*`.
+- `pnpm migration:run`: compila e aplica migrations ao banco indicado por `DB_*`. Foi executado com essas variaveis temporariamente apontando para o banco de teste verificado.
 - `pnpm test:integration`: executa apenas `test/**/*.postgres.integration.test.ts`.
 
-Esses scripts foram adicionados, mas os comandos de migration nao foram executados porque nao havia PostgreSQL disponivel para confirmar o destino e o historico real.
+`pnpm migration:run` foi executado depois de confirmar identidade, ausencia da tabela `events`, ausencia do historico `migrations` e ausencia do tipo `events_status_enum`. O TypeORM criou o historico e aplicou `CreateEventsTable1794873600000`. As variaveis temporarias foram removidas ao final. `pnpm migration:show` nao foi executado.
 
 ## Evidencias e pendencias
 
-`pnpm build` passou, `pnpm exec tsc --noEmit` passou e `pnpm test --run` passou com 11 testes durante a validacao da configuracao. A verificacao posterior do adapter tambem passou com tres testes direcionados.
+`pnpm build`, `pnpm exec tsc --noEmit`, `pnpm lint` e `pnpm test --run` passaram; a suite principal terminou com 4 arquivos e 14 testes aprovados. `pnpm test:integration` passou com 1 teste.
 
-Nao foi possivel consultar `current_database()`, `current_user`, schema existente ou historico de migrations; o Docker Desktop nao estava ativo e nao havia `.env` local. Nenhuma migration foi aplicada. Antes de usar `pnpm migration:run`, preencher configuracao local, verificar o banco alvo e inspecionar tabela e historico existentes.
+A consulta SQL confirmou `current_database() = arenaxviii_test_db`, `current_user = arenaxviii_test_user`, porta interna 5432, as 11 colunas de `events`, uma linha no historico `migrations` e zero eventos antes do teste de integracao. O banco de desenvolvimento e a conexao do AppModule com ele ainda nao foram verificados.

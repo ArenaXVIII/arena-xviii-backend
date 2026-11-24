@@ -90,7 +90,8 @@ O teste de memoria do Material 08 continua importando o `EventsModule` real e ex
 - `pnpm build`: passou.
 - `pnpm exec tsc --noEmit`: passou, incluindo o teste de PostgreSQL.
 - `pnpm lint`: passou.
-- `pnpm test --run`: 3 arquivos e 11 testes passaram antes da inclusao dos 3 testes direcionados de persistencia.
+- `pnpm test --run`: 4 arquivos e 14 testes passaram apos a migration.
 - `pnpm exec vitest run test/events.persistence.spec.ts`: 1 arquivo, 3 testes passaram; cobre mapeamento, `save`, `findEventById` e resultado ausente.
+- `pnpm test:integration`: 1 arquivo e 1 teste passou contra PostgreSQL real; o adapter TypeORM gravou e leu a entidade.
 
-A resolucao do provider em uma aplicacao conectada ao PostgreSQL e o startup real permanecem pendentes: nao havia servidor Docker/PostgreSQL disponivel para inicializar o DataSource.
+A resolucao do provider por meio do modulo Nest e o startup da aplicacao contra PostgreSQL de desenvolvimento permanecem pendentes. O teste real instancia o adapter diretamente e usa o banco de teste.

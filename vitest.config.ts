@@ -8,7 +8,7 @@ export default defineConfig({
   test: {
     globals: true,
     root: './',
-    include: ['**/*.spec.ts'],
+    include: ['**/*.spec.ts', 'test/**/*.http-spec.ts'],
     env: { NODE_ENV: 'test' },
   },
 });
