@@ -1,0 +1,5 @@
+@baseUrl = http://localhost:3000
+
+### Smoke local - GET raiz → esperado: 200 OK
+GET {{baseUrl}}/
+Accept: text/plain

@@ -1,0 +1,23 @@
+@baseUrl = http://localhost:3000
+
+### Cadastro valido → esperado: 201 Created
+POST {{baseUrl}}/events
+Content-Type: application/json
+
+{
+  "name": "REST Client - Evento Arena XVIII"
+}
+
+### Campo vazio → esperado: 422 Unprocessable Entity
+POST {{baseUrl}}/events
+Content-Type: application/json
+
+{
+  "name": "   "
+}
+
+### Campo ausente → esperado: 400 Bad Request
+POST {{baseUrl}}/events
+Content-Type: application/json
+
+{}

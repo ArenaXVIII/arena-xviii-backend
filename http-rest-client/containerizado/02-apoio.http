@@ -1,0 +1,13 @@
+@baseUrl = http://localhost:3000
+
+### Divulgacao inexistente → esperado: 404 Not Found
+PATCH {{baseUrl}}/events/00000000-0000-4000-8000-000000000000/publish
+Accept: application/json
+
+### Nome vazio no cadastro → esperado: 400 Bad Request
+POST {{baseUrl}}/events
+Content-Type: application/json
+
+{
+  "name": ""
+}

@@ -1,0 +1,39 @@
+@baseUrl = http://localhost:3000
+
+### Cadastro com propriedade extra → esperado: 201 Created, extra removida
+POST {{baseUrl}}/events
+Content-Type: application/json
+
+{
+  "name": "REST Client - Contrato fechado",
+  "campoExtra": "deve ser descartado"
+}
+
+### Nome vazio → esperado: 400 Bad Request
+POST {{baseUrl}}/events
+Content-Type: application/json
+
+{
+  "name": ""
+}
+
+### Nome nao string → esperado: 400 Bad Request
+POST {{baseUrl}}/events
+Content-Type: application/json
+
+{
+  "name": 123
+}
+
+### Nome composto por espacos → esperado: 422 Unprocessable Entity
+POST {{baseUrl}}/events
+Content-Type: application/json
+
+{
+  "name": "   "
+}
+
+### Divulgacao de evento inexistente → esperado: 404 Not Found
+# UUID conhecido como inexistente nesta execução.
+PATCH {{baseUrl}}/events/00000000-0000-4000-8000-000000000000/publish
+Accept: application/json

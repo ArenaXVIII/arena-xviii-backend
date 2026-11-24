@@ -1,0 +1,12 @@
+@baseUrl = http://localhost:3000
+
+### Cadastro valido - UC03 → esperado: 201 Created
+# @name criarEvento
+POST {{baseUrl}}/events
+Content-Type: application/json
+
+{
+  "name": "REST Client - UC03 - Arena XVIII"
+}
+
+@eventId = {{criarEvento.response.body.eventId}}
