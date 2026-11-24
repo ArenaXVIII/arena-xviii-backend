@@ -24,3 +24,17 @@ Resultado:
 - Imagem `arenaxviii-api:dev` identificada.
 - Nenhum erro impeditivo observado.
 
+## Correcao de evidencias em 2026-11-23
+
+- `.dockerignore` confirmado no codigo e adequado para excluir dependencias, build, Git, arquivos `.env` privados e artefatos locais.
+- `.env.example` permanece no contexto, sem segredos.
+- O build Docker nao foi executado nesta atividade porque `docker` nao esta instalado ou acessivel.
+- Nao houve identificacao nova de imagem, ID ou tamanho nesta atividade.
+
+## Verificacao real da imagem em 2026-11-24
+
+- `docker compose build api` concluiu com imagem `arenaxviii-api:dev`.
+- ID observado: `9d17e1bfcc89`.
+- `.dockerignore` excluiu `.env` e o contexto nao expos arquivos privados no build.
+- O build confirmou que o lockfile congelado esta valido.
+

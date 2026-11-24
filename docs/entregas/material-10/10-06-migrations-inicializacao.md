@@ -56,3 +56,19 @@ Confirmado:
 - TypeORM e modulos Nest inicializados.
 - Rotas `/` e `/events` mapeadas.
 
+## Correcao de evidencias em 2026-11-23
+
+- Confirmado no codigo e em disco: scripts `migration:show:prod` / `migration:run:prod`, DataSource compilado e migration compilada existem.
+- Compilacao local `pnpm build` aprovada e arquivos JavaScript do runtime confirmados.
+- Historico de migrations nao foi consultado por Compose nesta atividade.
+- Nenhuma migration foi aplicada novamente; o banco de desenvolvimento nao foi iniciado nem verificado.
+- Inicializacao da API em Docker nao foi executada; PostgreSQL `healthy` e logs anteriores nao sao evidencias desta atividade.
+
+## Resultado real em 2026-11-24
+
+- Antes da aplicacao, `docker compose run --rm --no-deps api pnpm migration:show:prod` mostrou `[ ] CreateEventsTable1794873600000`.
+- A migration foi aplicada somente no banco de desenvolvimento com `migration:run:prod`.
+- A verificacao posterior mostrou `[X] 1 CreateEventsTable1794873600000`.
+- API iniciada em contêiner e PostgreSQL de desenvolvimento iniciado com status `healthy`.
+- Logs mostraram as rotas mapeadas `/`, `POST /events` e `PATCH /events/:eventId/publish`, alem da inicializacao da aplicacao.
+

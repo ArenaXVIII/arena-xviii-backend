@@ -17,6 +17,7 @@ describe('EventsController HTTP boundary', () => {
         status: EventStatus.PUBLISHED,
         updatedAt: new Date('2026-11-17T12:00:00.000Z'),
         message: 'Evento divulgado com sucesso.',
+        internalNote: 'informacao-interna-ilustrativa',
       }),
     };
 
@@ -36,13 +37,18 @@ describe('EventsController HTTP boundary', () => {
     await app.close();
   });
 
-  it('delegates a valid request and returns the service response', async () => {
+  it('delegates a valid request and returns only the public response fields', async () => {
     await request(app.getHttpServer())
       .patch('/events/1/publish')
       .expect(200)
       .expect(({ body }) => {
-        expect(body.eventId).toBe('1');
-        expect(body.status).toBe(EventStatus.PUBLISHED);
+        expect(body).not.toHaveProperty('internalNote');
+        expect(body).toEqual({
+          eventId: '1',
+          status: EventStatus.PUBLISHED,
+          updatedAt: '2026-11-17T12:00:00.000Z',
+          message: 'Evento divulgado com sucesso.',
+        });
       });
 
     expect(eventsService.publishEvent).toHaveBeenCalledWith('1');

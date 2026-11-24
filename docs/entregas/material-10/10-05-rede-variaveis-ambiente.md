@@ -24,3 +24,18 @@ Nenhuma senha real foi registrada neste documento.
 - API publicada em `3000`.
 - Logs da API confirmaram inicializacao do TypeOrmCoreModule e dos modulos Nest.
 
+## Correcao de evidencias em 2026-11-23
+
+- Confirmado no codigo: a API recebe `DB_HOST=postgres`, `DB_PORT=5432`; banco de testes usa porta publicada `5434`.
+- `.env` local nao existe no workspace e nenhuma variavel `TEST_DB_*` estava definida no processo atual.
+- Rede compartilhada, resolucao DNS, healthchecks, variaveis dentro do processo e comunicacao TCP nao foram confirmados operacionalmente: Docker nao esta acessivel.
+
+## Evidencias reais em 2026-11-24
+
+- `.env` esta protegido pelo Git e todas as chaves de `.env.example` estao presentes.
+- Compose iniciou a API na porta publicada `3000`.
+- Banco de desenvolvimento publicado em `5432` e banco isolado de testes em `5434`.
+- A API se comunicou com o banco pelo host interno `postgres` e porta interna `5432`.
+- Os logs confirmaram que NestJS, TypeORM e os modulos da API iniciaram no contêiner.
+- Nenhum valor secreto foi registrado nos artefatos ou no diff.
+

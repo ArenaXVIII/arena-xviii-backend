@@ -9,6 +9,7 @@ import {
 import { EventsService } from '../services/events.service.js';
 import { CreateEventDto } from '../dtos/create-event.dto.js';
 import { CreateEventResponseDto } from '../dtos/create-event-response.dto.js';
+import { toCreateEventResponse } from '../mappers/create-event-response.mapper.js';
 
 @Controller('events')
 export class EventsController {
@@ -27,6 +28,7 @@ export class EventsController {
       );
     }
 
-    return this.eventsService.createEvent(name);
+    const response = await this.eventsService.createEvent(name);
+    return toCreateEventResponse(response);
   }
 }

@@ -37,3 +37,18 @@ Resultado: OK.
 - API: Up e porta `3000`.
 - Banco de testes continua separado na porta publicada `5434`.
 
+## Correcao de evidencias em 2026-11-23
+
+- Estrutura confirmada no codigo: API `api`, PostgreSQL `postgres`, PostgreSQL de testes `postgres-test`, porta 3000 e volume de desenvolvimento distinto.
+- `docker compose config --quiet` nao foi executado neste ambiente porque Docker/Compose nao esta disponivel.
+- Nao houve inicializacao Docker nem comprovacao nova de rede, healthcheck ou contêineres ativos.
+
+## Verificacao real em 2026-11-24
+
+- `docker compose config --quiet`: `OK`.
+- API iniciada: `arenaxviii-api`, imagem `arenaxviii-api:dev`, status `Up`, porta publicada `3000`.
+- Desenvolvimento: `arenaxviii-postgres`, PostgreSQL 17, status `healthy`, porta publicada `5432`.
+- Testes: `arenaxviii-postgres-test`, PostgreSQL 17, status `healthy`, porta publicada `5434`.
+- O banco de testes pertence ao projeto Compose `arena-xviii-backend`.
+- Nenhum volume ou banco foi removido; nao foram usados `down -v`, revert ou `synchronize`.
+

@@ -57,3 +57,38 @@ Durabilidade confirmada pelo mesmo registro antes e depois do reinicio da API.
 - Integracao PostgreSQL: 1 arquivo, 1 teste aprovado.
 - Nenhuma regressao observada.
 
+## Correcao de evidencias em 2026-11-23
+
+- Confirmado agora: `pnpm test` = 4 arquivos aprovados, 14 testes aprovados.
+- Confirmado agora: `pnpm test:e2e` = 2 arquivos aprovados, 2 testes aprovados.
+- Confirmado agora: `pnpm test:integration` nao iniciou o teste por falta de `TEST_DB_HOST` e das demais variaveis; resultado: 1 suite falha por configuracao, 1 teste pendente.
+- Nao confirmado: requisicao HTTP real, resposta do servidor, consulta SQL, reinicio da API e durabilidade.
+- Nenhuma operacao de banco de desenvolvimento ou destrutiva foi executada.
+
+## Verificacao integral real em 2026-11-24
+
+### HTTP
+
+- `POST /events` recebeu uma requisicao valida com campo extra fora do contrato.
+- Status real: `201`.
+- UUID real criado: `9a6553a5-03e0-4b99-bc16-40558ad850b0`.
+- Resposta confirmou `status: planning` e a mensagem de sucesso.
+- Um corpo com nome composto apenas por espacos foi rejeitado com `422` e a mensagem `Event name is required and cannot be empty.`
+
+### Durabilidade
+
+Antes do reinicio da API, a consulta por UUID retornou:
+
+```text
+9a6553a5-03e0-4b99-bc16-40558ad850b0|Evento de verificacao Material 10|planning|2026-11-24 01:12:28.848+00|2026-11-24 01:12:28.848+00
+```
+
+Somente o contêiner da API foi reiniciado. Depois do reinicio, a mesma consulta retornou os mesmos valores de UUID, nome, status e timestamps.
+
+### Testes
+
+- `pnpm test`: 4 arquivos aprovados, 14 testes aprovados.
+- Banco isolado `postgres-test`: portaria publicada `5434`, status `healthy`, projeto Compose `arena-xviii-backend`.
+- `pnpm test:integration`: 1 arquivo aprovado, 1 teste aprovado.
+- `pnpm test:e2e`: nao executado. Os testes legados em `test/*.e2e-spec.ts` importam o `AppModule` completo e podem abrir conexao com o banco de desenvolvimento; isso estaria fora do escopo seguro deste guia.
+
